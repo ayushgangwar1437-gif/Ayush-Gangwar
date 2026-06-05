@@ -1,0 +1,1845 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MindfulAI — Your Mental Wellness Companion</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='45' fill='%230a0a0a' stroke='%2300d4aa' stroke-width='4'/><path d='M30 50 Q50 25 70 50 Q50 75 30 50Z' fill='%2300d4aa' opacity='0.8'/><circle cx='50' cy='50' r='8' fill='%23fff'/></svg>">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #050508;
+    --bg2: #0c0c12;
+    --bg3: #12121a;
+    --surface: #1a1a24;
+    --surface2: #22222e;
+    --border: rgba(255,255,255,0.06);
+    --teal: #00d4aa;
+    --teal2: #00b894;
+    --violet: #7c3aed;
+    --violet2: #9f67fa;
+    --rose: #f43f5e;
+    --amber: #f59e0b;
+    --blue: #3b82f6;
+    --text: #f0f0f5;
+    --text2: #8888a0;
+    --text3: #55556a;
+    --glow: rgba(0,212,170,0.15);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Animated background */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 80% 60% at 20% 10%, rgba(0,212,170,0.07) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 50% at 80% 80%, rgba(124,58,237,0.07) 0%, transparent 60%),
+      radial-gradient(ellipse 40% 40% at 50% 50%, rgba(0,0,0,0) 0%, transparent 100%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* Grid overlay */
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: linear-gradient(rgba(255,255,255,0.015) 1px, transparent 1px),
+                      linear-gradient(90deg, rgba(255,255,255,0.015) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ===== LAYOUT ===== */
+  .app {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: 280px 1fr 320px;
+    grid-template-rows: 64px 1fr;
+    height: 100vh;
+    gap: 0;
+  }
+
+  /* ===== HEADER ===== */
+  header {
+    grid-column: 1 / -1;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 24px;
+    background: rgba(5,5,8,0.9);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border);
+    position: relative;
+    z-index: 100;
+  }
+
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 20px;
+    letter-spacing: -0.5px;
+  }
+
+  .logo-icon {
+    width: 36px; height: 36px;
+    background: linear-gradient(135deg, var(--teal), var(--violet2));
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+    box-shadow: 0 0 20px rgba(0,212,170,0.3);
+    animation: pulse-logo 3s ease-in-out infinite;
+  }
+
+  @keyframes pulse-logo {
+    0%,100% { box-shadow: 0 0 20px rgba(0,212,170,0.3); }
+    50% { box-shadow: 0 0 35px rgba(0,212,170,0.5), 0 0 60px rgba(0,212,170,0.2); }
+  }
+
+  .logo span { color: var(--teal); }
+
+  .header-status {
+    display: flex; align-items: center; gap: 8px;
+    font-size: 13px; color: var(--text2);
+  }
+
+  .status-dot {
+    width: 8px; height: 8px;
+    background: var(--teal);
+    border-radius: 50%;
+    animation: blink 2s ease-in-out infinite;
+  }
+
+  @keyframes blink {
+    0%,100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.4; transform: scale(0.8); }
+  }
+
+  .header-actions { display: flex; align-items: center; gap: 12px; }
+
+  .crisis-btn {
+    display: flex; align-items: center; gap: 8px;
+    padding: 8px 16px;
+    background: rgba(244,63,94,0.1);
+    border: 1px solid rgba(244,63,94,0.3);
+    border-radius: 8px;
+    color: var(--rose);
+    font-family: 'Syne', sans-serif;
+    font-size: 13px; font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    animation: crisis-pulse 4s ease-in-out infinite;
+  }
+
+  @keyframes crisis-pulse {
+    0%,90%,100% { box-shadow: none; }
+    95% { box-shadow: 0 0 20px rgba(244,63,94,0.4); border-color: var(--rose); }
+  }
+
+  .crisis-btn:hover {
+    background: rgba(244,63,94,0.2);
+    border-color: var(--rose);
+    box-shadow: 0 0 20px rgba(244,63,94,0.3);
+  }
+
+  /* ===== LEFT SIDEBAR ===== */
+  .sidebar-left {
+    background: var(--bg2);
+    border-right: 1px solid var(--border);
+    display: flex; flex-direction: column;
+    overflow: hidden;
+    padding: 20px 0;
+  }
+
+  .sidebar-section {
+    padding: 0 16px;
+    margin-bottom: 8px;
+  }
+
+  .sidebar-label {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--text3);
+    padding: 0 8px;
+    margin-bottom: 8px;
+  }
+
+  .nav-item {
+    display: flex; align-items: center; gap: 12px;
+    padding: 10px 12px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-bottom: 2px;
+    font-size: 14px;
+    color: var(--text2);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .nav-item::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 0;
+    background: linear-gradient(90deg, var(--teal), transparent);
+    transition: width 0.3s;
+    border-radius: 10px 0 0 10px;
+  }
+
+  .nav-item:hover { background: var(--surface); color: var(--text); }
+  .nav-item:hover::before { width: 3px; }
+
+  .nav-item.active {
+    background: linear-gradient(135deg, rgba(0,212,170,0.1), rgba(124,58,237,0.1));
+    color: var(--teal);
+    border: 1px solid rgba(0,212,170,0.15);
+  }
+
+  .nav-item.active::before { width: 3px; }
+
+  .nav-icon { font-size: 18px; width: 24px; text-align: center; }
+
+  .nav-badge {
+    margin-left: auto;
+    background: var(--teal);
+    color: var(--bg);
+    font-size: 10px; font-weight: 700;
+    padding: 2px 7px;
+    border-radius: 999px;
+  }
+
+  /* Mood quick-track */
+  .mood-quick {
+    margin: 8px 16px;
+    padding: 14px;
+    background: var(--surface);
+    border-radius: 12px;
+    border: 1px solid var(--border);
+  }
+
+  .mood-quick-title {
+    font-size: 11px; font-weight: 600;
+    letter-spacing: 1px; text-transform: uppercase;
+    color: var(--text3); margin-bottom: 12px;
+  }
+
+  .mood-emojis {
+    display: flex; justify-content: space-between;
+  }
+
+  .mood-emoji-btn {
+    font-size: 22px;
+    cursor: pointer;
+    padding: 6px;
+    border-radius: 8px;
+    transition: all 0.2s;
+    border: 2px solid transparent;
+    background: none;
+  }
+
+  .mood-emoji-btn:hover { transform: scale(1.2); background: rgba(255,255,255,0.05); }
+  .mood-emoji-btn.selected { border-color: var(--teal); background: rgba(0,212,170,0.1); transform: scale(1.1); }
+
+  /* Streak */
+  .streak-card {
+    margin: 8px 16px;
+    padding: 14px;
+    background: linear-gradient(135deg, rgba(124,58,237,0.1), rgba(0,212,170,0.1));
+    border: 1px solid rgba(124,58,237,0.2);
+    border-radius: 12px;
+    text-align: center;
+  }
+
+  .streak-number {
+    font-family: 'Syne', sans-serif;
+    font-size: 32px; font-weight: 800;
+    background: linear-gradient(135deg, var(--teal), var(--violet2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    line-height: 1;
+  }
+
+  .streak-label { font-size: 11px; color: var(--text2); margin-top: 4px; }
+
+  /* ===== MAIN CHAT ===== */
+  .chat-area {
+    display: flex; flex-direction: column;
+    background: var(--bg);
+    overflow: hidden;
+  }
+
+  .chat-header {
+    padding: 16px 24px;
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; gap: 12px;
+  }
+
+  .ai-avatar {
+    width: 42px; height: 42px;
+    background: linear-gradient(135deg, var(--teal), var(--violet2));
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px;
+    position: relative;
+    box-shadow: 0 0 20px rgba(0,212,170,0.3);
+  }
+
+  .ai-avatar::after {
+    content: '';
+    position: absolute;
+    bottom: 1px; right: 1px;
+    width: 10px; height: 10px;
+    background: #22c55e;
+    border: 2px solid var(--bg);
+    border-radius: 50%;
+  }
+
+  .ai-info h3 {
+    font-family: 'Syne', sans-serif;
+    font-size: 15px; font-weight: 700;
+  }
+
+  .ai-info p { font-size: 12px; color: var(--text2); }
+
+  .chat-tools {
+    margin-left: auto;
+    display: flex; gap: 8px;
+  }
+
+  .tool-btn {
+    width: 36px; height: 36px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text2);
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px;
+    transition: all 0.2s;
+  }
+
+  .tool-btn:hover { background: var(--surface2); color: var(--text); border-color: rgba(0,212,170,0.3); }
+
+  /* Messages */
+  .messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 24px;
+    display: flex; flex-direction: column;
+    gap: 20px;
+    scroll-behavior: smooth;
+  }
+
+  .messages::-webkit-scrollbar { width: 4px; }
+  .messages::-webkit-scrollbar-track { background: transparent; }
+  .messages::-webkit-scrollbar-thumb { background: var(--surface2); border-radius: 2px; }
+
+  .message {
+    display: flex; align-items: flex-start; gap: 12px;
+    animation: msg-in 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  @keyframes msg-in {
+    from { opacity: 0; transform: translateY(16px) scale(0.96); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+  }
+
+  .message.user { flex-direction: row-reverse; }
+
+  .msg-avatar {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px;
+  }
+
+  .message.ai .msg-avatar {
+    background: linear-gradient(135deg, var(--teal), var(--violet2));
+    box-shadow: 0 0 15px rgba(0,212,170,0.25);
+  }
+
+  .message.user .msg-avatar {
+    background: linear-gradient(135deg, var(--violet), var(--violet2));
+  }
+
+  .msg-content {
+    max-width: 75%;
+    display: flex; flex-direction: column; gap: 6px;
+  }
+
+  .message.user .msg-content { align-items: flex-end; }
+
+  .msg-bubble {
+    padding: 14px 18px;
+    border-radius: 18px;
+    font-size: 14px;
+    line-height: 1.6;
+    position: relative;
+  }
+
+  .message.ai .msg-bubble {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-bottom-left-radius: 4px;
+  }
+
+  .message.user .msg-bubble {
+    background: linear-gradient(135deg, rgba(0,212,170,0.15), rgba(124,58,237,0.15));
+    border: 1px solid rgba(0,212,170,0.2);
+    border-bottom-right-radius: 4px;
+  }
+
+  .msg-time { font-size: 11px; color: var(--text3); }
+
+  /* Quick actions in chat */
+  .quick-actions {
+    display: flex; gap: 8px; flex-wrap: wrap;
+    padding: 0 24px 16px;
+  }
+
+  .quick-chip {
+    padding: 8px 16px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    font-size: 13px; color: var(--text2);
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+
+  .quick-chip:hover {
+    background: rgba(0,212,170,0.1);
+    border-color: rgba(0,212,170,0.3);
+    color: var(--teal);
+    transform: translateY(-1px);
+  }
+
+  /* Input */
+  .chat-input-area {
+    padding: 16px 24px 20px;
+    border-top: 1px solid var(--border);
+    background: rgba(5,5,8,0.8);
+    backdrop-filter: blur(20px);
+  }
+
+  .input-wrapper {
+    display: flex; align-items: flex-end; gap: 12px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 12px 12px 12px 18px;
+    transition: all 0.3s;
+  }
+
+  .input-wrapper:focus-within {
+    border-color: rgba(0,212,170,0.4);
+    box-shadow: 0 0 0 3px rgba(0,212,170,0.08);
+  }
+
+  #chatInput {
+    flex: 1;
+    background: none;
+    border: none;
+    outline: none;
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    resize: none;
+    max-height: 120px;
+    line-height: 1.5;
+  }
+
+  #chatInput::placeholder { color: var(--text3); }
+
+  .input-actions { display: flex; gap: 8px; align-items: center; }
+
+  .input-icon-btn {
+    width: 34px; height: 34px;
+    border-radius: 8px;
+    background: none;
+    border: none;
+    color: var(--text3);
+    cursor: pointer;
+    font-size: 18px;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.2s;
+  }
+
+  .input-icon-btn:hover { color: var(--teal); background: rgba(0,212,170,0.1); }
+
+  .send-btn {
+    width: 38px; height: 38px;
+    background: linear-gradient(135deg, var(--teal), var(--violet2));
+    border: none;
+    border-radius: 10px;
+    color: white;
+    cursor: pointer;
+    font-size: 16px;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.2s;
+    box-shadow: 0 4px 15px rgba(0,212,170,0.3);
+  }
+
+  .send-btn:hover { transform: scale(1.05); box-shadow: 0 6px 20px rgba(0,212,170,0.4); }
+  .send-btn:active { transform: scale(0.95); }
+
+  /* Typing indicator */
+  .typing-indicator .msg-bubble {
+    display: flex; align-items: center; gap: 5px;
+    padding: 16px 20px;
+  }
+
+  .typing-dot {
+    width: 7px; height: 7px;
+    background: var(--teal);
+    border-radius: 50%;
+    animation: typing 1.2s ease-in-out infinite;
+  }
+
+  .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+  .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+  @keyframes typing {
+    0%,60%,100% { transform: translateY(0); opacity: 0.4; }
+    30% { transform: translateY(-6px); opacity: 1; }
+  }
+
+  /* ===== RIGHT SIDEBAR ===== */
+  .sidebar-right {
+    background: var(--bg2);
+    border-left: 1px solid var(--border);
+    overflow-y: auto;
+    padding: 20px 16px;
+    display: flex; flex-direction: column; gap: 16px;
+  }
+
+  .sidebar-right::-webkit-scrollbar { width: 4px; }
+  .sidebar-right::-webkit-scrollbar-thumb { background: var(--surface2); }
+
+  .widget {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 16px;
+    transition: all 0.3s;
+  }
+
+  .widget:hover { border-color: rgba(0,212,170,0.15); }
+
+  .widget-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 13px; font-weight: 700;
+    color: var(--text2);
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    margin-bottom: 14px;
+    display: flex; align-items: center; gap: 8px;
+  }
+
+  .widget-title span { font-size: 16px; }
+
+  /* Mood chart */
+  .mood-chart {
+    display: flex; align-items: flex-end; gap: 6px;
+    height: 80px;
+  }
+
+  .mood-bar-wrap { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+
+  .mood-bar {
+    width: 100%;
+    border-radius: 4px 4px 0 0;
+    background: linear-gradient(180deg, var(--teal), var(--violet2));
+    transition: height 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+    opacity: 0.7;
+    min-height: 4px;
+  }
+
+  .mood-bar.today { opacity: 1; box-shadow: 0 -4px 15px rgba(0,212,170,0.4); }
+  .mood-bar-label { font-size: 10px; color: var(--text3); }
+
+  /* Assessment */
+  .assessment-items { display: flex; flex-direction: column; gap: 10px; }
+
+  .assess-item { }
+
+  .assess-label {
+    display: flex; justify-content: space-between;
+    font-size: 12px; color: var(--text2);
+    margin-bottom: 5px;
+  }
+
+  .assess-score { color: var(--teal); font-weight: 600; }
+
+  .assess-bar {
+    height: 6px;
+    background: var(--bg3);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+
+  .assess-fill {
+    height: 100%;
+    border-radius: 3px;
+    transition: width 1s ease;
+    animation: fill-in 1.5s ease forwards;
+  }
+
+  @keyframes fill-in { from { width: 0; } }
+
+  /* Journal */
+  .journal-area {
+    width: 100%; min-height: 100px; max-height: 160px;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px;
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    resize: none;
+    outline: none;
+    transition: border-color 0.2s;
+    line-height: 1.6;
+  }
+
+  .journal-area:focus { border-color: rgba(0,212,170,0.3); }
+  .journal-area::placeholder { color: var(--text3); }
+
+  .sentiment-display {
+    margin-top: 10px;
+    padding: 10px;
+    background: var(--bg3);
+    border-radius: 8px;
+    font-size: 12px;
+    color: var(--text2);
+    display: flex; align-items: center; gap: 8px;
+  }
+
+  .sentiment-emoji { font-size: 20px; }
+
+  /* Music */
+  .music-tracks { display: flex; flex-direction: column; gap: 8px; }
+
+  .track {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px;
+    background: var(--bg3);
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: 1px solid transparent;
+  }
+
+  .track:hover { background: rgba(0,212,170,0.05); border-color: rgba(0,212,170,0.15); }
+  .track.playing { border-color: rgba(0,212,170,0.3); background: rgba(0,212,170,0.08); }
+
+  .track-icon {
+    width: 36px; height: 36px;
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+    flex-shrink: 0;
+  }
+
+  .track-info { flex: 1; min-width: 0; }
+  .track-name { font-size: 13px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .track-genre { font-size: 11px; color: var(--text3); }
+
+  .track-play {
+    color: var(--teal);
+    font-size: 18px;
+  }
+
+  /* Music visualizer */
+  .visualizer {
+    display: flex; align-items: center; gap: 3px;
+    height: 16px;
+  }
+
+  .viz-bar {
+    width: 3px;
+    background: var(--teal);
+    border-radius: 2px;
+    animation: viz 0.8s ease-in-out infinite alternate;
+    opacity: 0.7;
+  }
+
+  .viz-bar:nth-child(1) { height: 40%; animation-delay: 0s; }
+  .viz-bar:nth-child(2) { height: 70%; animation-delay: 0.1s; }
+  .viz-bar:nth-child(3) { height: 100%; animation-delay: 0.2s; }
+  .viz-bar:nth-child(4) { height: 60%; animation-delay: 0.15s; }
+  .viz-bar:nth-child(5) { height: 30%; animation-delay: 0.05s; }
+
+  @keyframes viz {
+    from { transform: scaleY(0.3); }
+    to { transform: scaleY(1); }
+  }
+
+  /* Breathing exercise */
+  .breathing-container {
+    display: flex; flex-direction: column; align-items: center; gap: 16px;
+    padding: 10px 0;
+  }
+
+  .breath-circle {
+    width: 80px; height: 80px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(0,212,170,0.3), rgba(0,212,170,0.05));
+    border: 2px solid rgba(0,212,170,0.4);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; color: var(--teal); font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    box-shadow: 0 0 20px rgba(0,212,170,0.1);
+  }
+
+  .breath-circle.inhale {
+    animation: breathe-in 4s ease-in-out;
+  }
+
+  .breath-circle.exhale {
+    animation: breathe-out 4s ease-in-out;
+  }
+
+  @keyframes breathe-in {
+    0% { transform: scale(1); box-shadow: 0 0 20px rgba(0,212,170,0.1); }
+    100% { transform: scale(1.4); box-shadow: 0 0 40px rgba(0,212,170,0.4); }
+  }
+
+  @keyframes breathe-out {
+    0% { transform: scale(1.4); box-shadow: 0 0 40px rgba(0,212,170,0.4); }
+    100% { transform: scale(1); box-shadow: 0 0 20px rgba(0,212,170,0.1); }
+  }
+
+  .breath-text { font-size: 13px; color: var(--text2); text-align: center; }
+  .breath-phase { font-size: 18px; font-weight: 600; color: var(--teal); }
+
+  .breath-btn {
+    padding: 8px 20px;
+    background: rgba(0,212,170,0.1);
+    border: 1px solid rgba(0,212,170,0.3);
+    border-radius: 8px;
+    color: var(--teal);
+    font-family: 'Syne', sans-serif;
+    font-size: 12px; font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .breath-btn:hover { background: rgba(0,212,170,0.2); }
+
+  /* Progress */
+  .progress-rings {
+    display: flex; justify-content: space-around;
+    padding: 8px 0;
+  }
+
+  .ring-container {
+    display: flex; flex-direction: column; align-items: center; gap: 6px;
+  }
+
+  .ring-svg { transform: rotate(-90deg); }
+
+  .ring-track { fill: none; stroke: var(--bg3); stroke-width: 6; }
+
+  .ring-fill {
+    fill: none;
+    stroke-width: 6;
+    stroke-linecap: round;
+    transition: stroke-dashoffset 1.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+    animation: ring-in 2s ease forwards;
+  }
+
+  @keyframes ring-in { from { stroke-dashoffset: 157; } }
+
+  .ring-label { font-size: 11px; color: var(--text3); text-align: center; }
+  .ring-value {
+    position: absolute;
+    font-family: 'Syne', sans-serif;
+    font-size: 14px; font-weight: 700;
+  }
+
+  .ring-wrap { position: relative; display: flex; align-items: center; justify-content: center; }
+
+  /* ===== MODALS ===== */
+  .modal-overlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.8);
+    backdrop-filter: blur(8px);
+    z-index: 1000;
+    display: flex; align-items: center; justify-content: center;
+    opacity: 0; pointer-events: none;
+    transition: all 0.3s;
+  }
+
+  .modal-overlay.active { opacity: 1; pointer-events: all; }
+
+  .modal {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 32px;
+    width: 480px;
+    max-width: 90vw;
+    transform: scale(0.9) translateY(20px);
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    max-height: 85vh;
+    overflow-y: auto;
+  }
+
+  .modal-overlay.active .modal { transform: scale(1) translateY(0); }
+
+  .modal-header {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 24px;
+  }
+
+  .modal-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 20px; font-weight: 800;
+  }
+
+  .modal-close {
+    width: 32px; height: 32px;
+    border-radius: 8px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text2);
+    cursor: pointer;
+    font-size: 18px;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.2s;
+  }
+
+  .modal-close:hover { background: var(--surface2); color: var(--text); }
+
+  /* Crisis modal */
+  .crisis-modal .modal { border-color: rgba(244,63,94,0.3); }
+
+  .crisis-header { text-align: center; margin-bottom: 24px; }
+  .crisis-emoji { font-size: 48px; margin-bottom: 12px; }
+  .crisis-msg { font-size: 14px; line-height: 1.6; color: var(--text2); }
+
+  .hotline-list { display: flex; flex-direction: column; gap: 10px; margin: 20px 0; }
+
+  .hotline-card {
+    display: flex; align-items: center; gap: 14px;
+    padding: 14px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-decoration: none;
+  }
+
+  .hotline-card:hover { border-color: rgba(0,212,170,0.3); background: rgba(0,212,170,0.05); }
+
+  .hotline-icon {
+    width: 42px; height: 42px;
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px;
+    flex-shrink: 0;
+  }
+
+  .hotline-info h4 { font-size: 14px; font-weight: 600; }
+  .hotline-info p { font-size: 12px; color: var(--text2); }
+  .hotline-number { margin-left: auto; font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 700; color: var(--teal); }
+
+  /* Assessment modal */
+  .assessment-question { margin-bottom: 20px; }
+  .assess-q-text { font-size: 14px; line-height: 1.5; margin-bottom: 12px; }
+
+  .assess-scale {
+    display: flex; gap: 8px;
+  }
+
+  .scale-btn {
+    flex: 1;
+    padding: 8px 4px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text2);
+    cursor: pointer;
+    font-size: 12px; font-weight: 600;
+    transition: all 0.2s;
+    text-align: center;
+  }
+
+  .scale-btn:hover { background: rgba(0,212,170,0.1); border-color: rgba(0,212,170,0.3); }
+  .scale-btn.selected { background: rgba(0,212,170,0.15); border-color: var(--teal); color: var(--teal); }
+
+  .modal-btn {
+    width: 100%;
+    padding: 12px;
+    background: linear-gradient(135deg, var(--teal), var(--violet2));
+    border: none;
+    border-radius: 10px;
+    color: white;
+    font-family: 'Syne', sans-serif;
+    font-size: 15px; font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-top: 16px;
+    letter-spacing: 0.5px;
+  }
+
+  .modal-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(0,212,170,0.3); }
+
+  /* ===== NOTIFICATIONS ===== */
+  .toast {
+    position: fixed;
+    bottom: 24px; right: 24px;
+    background: var(--surface);
+    border: 1px solid rgba(0,212,170,0.3);
+    border-radius: 12px;
+    padding: 14px 20px;
+    font-size: 14px;
+    z-index: 9999;
+    transform: translateX(120%);
+    transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    display: flex; align-items: center; gap: 10px;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.5);
+    max-width: 300px;
+  }
+
+  .toast.show { transform: translateX(0); }
+
+  /* Panel switcher */
+  .panel-tabs {
+    display: flex; gap: 4px;
+    padding: 4px;
+    background: var(--bg3);
+    border-radius: 10px;
+    margin-bottom: 16px;
+  }
+
+  .panel-tab {
+    flex: 1; padding: 7px;
+    border-radius: 7px;
+    border: none;
+    background: none;
+    color: var(--text3);
+    font-size: 11px; font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: 'Syne', sans-serif;
+    letter-spacing: 0.5px;
+  }
+
+  .panel-tab.active {
+    background: var(--surface2);
+    color: var(--teal);
+  }
+
+  .panel-content { display: none; }
+  .panel-content.active { display: block; }
+
+  /* Meditation timer */
+  .meditation-timer {
+    text-align: center; padding: 10px 0;
+  }
+
+  .med-time {
+    font-family: 'Syne', sans-serif;
+    font-size: 40px; font-weight: 800;
+    background: linear-gradient(135deg, var(--teal), var(--violet2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    letter-spacing: -1px;
+    margin: 10px 0;
+  }
+
+  .med-controls { display: flex; gap: 10px; justify-content: center; margin-top: 12px; }
+
+  .med-btn {
+    padding: 8px 18px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text2);
+    font-family: 'Syne', sans-serif;
+    font-size: 12px; font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .med-btn:hover { background: var(--surface2); color: var(--text); }
+  .med-btn.primary { background: rgba(0,212,170,0.1); border-color: rgba(0,212,170,0.3); color: var(--teal); }
+  .med-btn.primary:hover { background: rgba(0,212,170,0.2); }
+
+  /* Ripple on click */
+  @keyframes ripple {
+    to { transform: scale(4); opacity: 0; }
+  }
+
+  /* Stars/particles BG */
+  .particle {
+    position: fixed;
+    border-radius: 50%;
+    pointer-events: none;
+    animation: float-particle linear infinite;
+    opacity: 0;
+  }
+
+  @keyframes float-particle {
+    0% { transform: translateY(100vh) scale(0); opacity: 0; }
+    10% { opacity: 0.6; }
+    90% { opacity: 0.3; }
+    100% { transform: translateY(-10vh) scale(1); opacity: 0; }
+  }
+
+  /* Responsive */
+  @media (max-width: 1200px) {
+    .app { grid-template-columns: 240px 1fr 280px; }
+  }
+
+  @media (max-width: 900px) {
+    .app { grid-template-columns: 1fr; grid-template-rows: 64px 1fr; }
+    .sidebar-left, .sidebar-right { display: none; }
+    .chat-area { grid-column: 1; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Floating particles -->
+<div id="particles"></div>
+
+<div class="app">
+  <!-- HEADER -->
+  <header>
+    <div class="logo">
+      <div class="logo-icon">🧠</div>
+      Mindful<span>AI</span>
+    </div>
+    <div class="header-status">
+      <div class="status-dot"></div>
+      AI Companion Active · Session #42
+    </div>
+    <div class="header-actions">
+      <button class="crisis-btn" onclick="openModal('crisisModal')">
+        📞 Crisis Support
+      </button>
+    </div>
+  </header>
+
+  <!-- LEFT SIDEBAR -->
+  <aside class="sidebar-left">
+    <div class="sidebar-section">
+      <div class="sidebar-label">Navigation</div>
+      <div class="nav-item active" onclick="setNav(this, 'chat')">
+        <span class="nav-icon">💬</span> Chat Support
+      </div>
+      <div class="nav-item" onclick="setNav(this, 'journal')">
+        <span class="nav-icon">📝</span> Journal
+        <span class="nav-badge">3</span>
+      </div>
+      <div class="nav-item" onclick="setNav(this, 'meditation')">
+        <span class="nav-icon">🧘</span> Meditation
+      </div>
+      <div class="nav-item" onclick="openModal('assessModal')">
+        <span class="nav-icon">📊</span> Assessment
+      </div>
+      <div class="nav-item" onclick="setNav(this, 'progress')">
+        <span class="nav-icon">📈</span> Progress
+      </div>
+      <div class="nav-item" onclick="setNav(this, 'music')">
+        <span class="nav-icon">🎵</span> Music Therapy
+      </div>
+    </div>
+
+    <!-- Mood quick track -->
+    <div class="mood-quick">
+      <div class="mood-quick-title">How are you feeling?</div>
+      <div class="mood-emojis">
+        <button class="mood-emoji-btn" onclick="trackMood(this, '😢', 1)" title="Very sad">😢</button>
+        <button class="mood-emoji-btn" onclick="trackMood(this, '😔', 2)" title="Sad">😔</button>
+        <button class="mood-emoji-btn" onclick="trackMood(this, '😐', 3)" title="Neutral">😐</button>
+        <button class="mood-emoji-btn" onclick="trackMood(this, '🙂', 4)" title="Good">🙂</button>
+        <button class="mood-emoji-btn" onclick="trackMood(this, '😊', 5)" title="Great">😊</button>
+      </div>
+    </div>
+
+    <!-- Streak -->
+    <div class="streak-card">
+      <div class="streak-number" id="streakNum">7</div>
+      <div class="streak-label">🔥 Day Streak</div>
+    </div>
+  </aside>
+
+  <!-- MAIN CHAT -->
+  <main class="chat-area">
+    <div class="chat-header">
+      <div class="ai-avatar">🤖</div>
+      <div class="ai-info">
+        <h3>Aria — Your Wellness Companion</h3>
+        <p>Certified Mental Wellness AI · Always here for you</p>
+      </div>
+      <div class="chat-tools">
+        <button class="tool-btn" title="Voice Input" onclick="showToast('🎙️ Voice input coming soon!')">🎙️</button>
+        <button class="tool-btn" title="Export Chat" onclick="exportChat()">💾</button>
+        <button class="tool-btn" title="Clear Chat" onclick="clearChat()">🗑️</button>
+      </div>
+    </div>
+
+    <div class="messages" id="messages">
+      <!-- Welcome message -->
+      <div class="message ai">
+        <div class="msg-avatar">🤖</div>
+        <div class="msg-content">
+          <div class="msg-bubble">
+            Hello! I'm <strong>Aria</strong>, your personal mental wellness companion. 🌿<br><br>
+            I'm here to listen, support, and guide you on your journey to mental well-being. How are you feeling today?
+          </div>
+          <div class="msg-time">Just now</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick action chips -->
+    <div class="quick-actions" id="quickActions">
+      <div class="quick-chip" onclick="sendQuick('I\'m feeling anxious')">😰 Feeling anxious</div>
+      <div class="quick-chip" onclick="sendQuick('I need to relax')">🧘 Need to relax</div>
+      <div class="quick-chip" onclick="sendQuick('I\'m having trouble sleeping')">😴 Sleep issues</div>
+      <div class="quick-chip" onclick="sendQuick('I feel lonely')">💙 Feeling lonely</div>
+      <div class="quick-chip" onclick="sendQuick('Help me with breathing')">💨 Breathing exercise</div>
+    </div>
+
+    <!-- Input -->
+    <div class="chat-input-area">
+      <div class="input-wrapper">
+        <textarea id="chatInput" placeholder="Share what's on your mind..." rows="1"
+          onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea>
+        <div class="input-actions">
+          <button class="input-icon-btn" onclick="showEmojiPicker()" title="Emoji">😊</button>
+          <button class="send-btn" onclick="sendMessage()" title="Send">➤</button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- RIGHT SIDEBAR -->
+  <aside class="sidebar-right">
+    <!-- Panel tabs -->
+    <div class="panel-tabs">
+      <button class="panel-tab active" onclick="switchPanel('mood')">Mood</button>
+      <button class="panel-tab" onclick="switchPanel('tools')">Tools</button>
+      <button class="panel-tab" onclick="switchPanel('journal')">Journal</button>
+    </div>
+
+    <!-- Mood Panel -->
+    <div class="panel-content active" id="panel-mood">
+      <!-- Mood chart -->
+      <div class="widget">
+        <div class="widget-title"><span>📊</span> Weekly Mood</div>
+        <div class="mood-chart" id="moodChart">
+          <div class="mood-bar-wrap"><div class="mood-bar" style="height:40%"></div><div class="mood-bar-label">M</div></div>
+          <div class="mood-bar-wrap"><div class="mood-bar" style="height:60%"></div><div class="mood-bar-label">T</div></div>
+          <div class="mood-bar-wrap"><div class="mood-bar" style="height:55%"></div><div class="mood-bar-label">W</div></div>
+          <div class="mood-bar-wrap"><div class="mood-bar" style="height:75%"></div><div class="mood-bar-label">T</div></div>
+          <div class="mood-bar-wrap"><div class="mood-bar" style="height:45%"></div><div class="mood-bar-label">F</div></div>
+          <div class="mood-bar-wrap"><div class="mood-bar" style="height:85%"></div><div class="mood-bar-label">S</div></div>
+          <div class="mood-bar-wrap"><div class="mood-bar today" style="height:70%"></div><div class="mood-bar-label">S</div></div>
+        </div>
+      </div>
+
+      <!-- Assessment -->
+      <div class="widget">
+        <div class="widget-title"><span>🧪</span> Health Scores</div>
+        <div class="assessment-items">
+          <div class="assess-item">
+            <div class="assess-label"><span>Anxiety Level</span><span class="assess-score">32/100</span></div>
+            <div class="assess-bar"><div class="assess-fill" style="width:32%;background:linear-gradient(90deg,#22c55e,#84cc16)"></div></div>
+          </div>
+          <div class="assess-item">
+            <div class="assess-label"><span>Depression Risk</span><span class="assess-score">28/100</span></div>
+            <div class="assess-bar"><div class="assess-fill" style="width:28%;background:linear-gradient(90deg,#22c55e,#84cc16)"></div></div>
+          </div>
+          <div class="assess-item">
+            <div class="assess-label"><span>Stress Index</span><span class="assess-score">45/100</span></div>
+            <div class="assess-bar"><div class="assess-fill" style="width:45%;background:linear-gradient(90deg,#f59e0b,#f97316)"></div></div>
+          </div>
+          <div class="assess-item">
+            <div class="assess-label"><span>Well-being</span><span class="assess-score">72/100</span></div>
+            <div class="assess-bar"><div class="assess-fill" style="width:72%;background:linear-gradient(90deg,#00d4aa,#7c3aed)"></div></div>
+          </div>
+        </div>
+        <button class="modal-btn" style="margin-top:12px;font-size:13px;padding:10px" onclick="openModal('assessModal')">Take Full Assessment</button>
+      </div>
+
+      <!-- Progress rings -->
+      <div class="widget">
+        <div class="widget-title"><span>📈</span> Today's Goals</div>
+        <div class="progress-rings">
+          <div class="ring-container">
+            <div class="ring-wrap">
+              <svg class="ring-svg" width="60" height="60">
+                <circle class="ring-track" cx="30" cy="30" r="25"/>
+                <circle class="ring-fill" cx="30" cy="30" r="25" stroke="var(--teal)"
+                  stroke-dasharray="157" stroke-dashoffset="40"/>
+              </svg>
+              <span class="ring-value" style="color:var(--teal);font-size:12px">75%</span>
+            </div>
+            <div class="ring-label">Mindful</div>
+          </div>
+          <div class="ring-container">
+            <div class="ring-wrap">
+              <svg class="ring-svg" width="60" height="60">
+                <circle class="ring-track" cx="30" cy="30" r="25"/>
+                <circle class="ring-fill" cx="30" cy="30" r="25" stroke="var(--violet2)"
+                  stroke-dasharray="157" stroke-dashoffset="80"/>
+              </svg>
+              <span class="ring-value" style="color:var(--violet2);font-size:12px">49%</span>
+            </div>
+            <div class="ring-label">Journal</div>
+          </div>
+          <div class="ring-container">
+            <div class="ring-wrap">
+              <svg class="ring-svg" width="60" height="60">
+                <circle class="ring-track" cx="30" cy="30" r="25"/>
+                <circle class="ring-fill" cx="30" cy="30" r="25" stroke="var(--amber)"
+                  stroke-dasharray="157" stroke-dashoffset="16"/>
+              </svg>
+              <span class="ring-value" style="color:var(--amber);font-size:12px">90%</span>
+            </div>
+            <div class="ring-label">Sleep</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tools Panel -->
+    <div class="panel-content" id="panel-tools">
+      <!-- Breathing -->
+      <div class="widget">
+        <div class="widget-title"><span>💨</span> Breathing Exercise</div>
+        <div class="breathing-container">
+          <div class="breath-circle" id="breathCircle" onclick="startBreathing()">
+            <span id="breathText">Tap</span>
+          </div>
+          <div class="breath-text">
+            <div class="breath-phase" id="breathPhase">Box Breathing</div>
+            <div id="breathInstruction">Tap the circle to begin</div>
+          </div>
+          <button class="breath-btn" onclick="resetBreathing()">Reset</button>
+        </div>
+      </div>
+
+      <!-- Meditation timer -->
+      <div class="widget">
+        <div class="widget-title"><span>🧘</span> Meditation Timer</div>
+        <div class="meditation-timer">
+          <div>Select duration</div>
+          <div class="med-time" id="medTime">05:00</div>
+          <div style="display:flex;gap:8px;justify-content:center;margin-bottom:10px">
+            <button class="med-btn" onclick="setMedTime(5)">5m</button>
+            <button class="med-btn" onclick="setMedTime(10)">10m</button>
+            <button class="med-btn" onclick="setMedTime(15)">15m</button>
+            <button class="med-btn" onclick="setMedTime(20)">20m</button>
+          </div>
+          <div class="med-controls">
+            <button class="med-btn primary" id="medStartBtn" onclick="toggleMeditation()">▶ Start</button>
+            <button class="med-btn" onclick="resetMeditation()">↺ Reset</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Music -->
+      <div class="widget">
+        <div class="widget-title"><span>🎵</span> Music Therapy</div>
+        <div class="music-tracks" id="musicList">
+          <div class="track" onclick="playTrack(this, 'Calm Ocean Waves')">
+            <div class="track-icon" style="background:rgba(59,130,246,0.15)">🌊</div>
+            <div class="track-info">
+              <div class="track-name">Calm Ocean Waves</div>
+              <div class="track-genre">Nature Sounds · Anxiety Relief</div>
+            </div>
+            <div class="track-play">▶</div>
+          </div>
+          <div class="track" onclick="playTrack(this, 'Deep Focus Binaural')">
+            <div class="track-icon" style="background:rgba(124,58,237,0.15)">🎧</div>
+            <div class="track-info">
+              <div class="track-name">Deep Focus Binaural</div>
+              <div class="track-genre">Binaural · Focus</div>
+            </div>
+            <div class="track-play">▶</div>
+          </div>
+          <div class="track" onclick="playTrack(this, 'Forest Morning')">
+            <div class="track-icon" style="background:rgba(34,197,94,0.15)">🌿</div>
+            <div class="track-info">
+              <div class="track-name">Forest Morning</div>
+              <div class="track-genre">Nature · Sleep Aid</div>
+            </div>
+            <div class="track-play">▶</div>
+          </div>
+          <div class="track" onclick="playTrack(this, 'Tibetan Bowls')">
+            <div class="track-icon" style="background:rgba(245,158,11,0.15)">🔔</div>
+            <div class="track-info">
+              <div class="track-name">Tibetan Bowls</div>
+              <div class="track-genre">Meditation · Healing</div>
+            </div>
+            <div class="track-play">▶</div>
+          </div>
+        </div>
+        <div id="nowPlaying" style="display:none;margin-top:12px;padding:10px;background:rgba(0,212,170,0.07);border:1px solid rgba(0,212,170,0.2);border-radius:10px;">
+          <div style="font-size:11px;color:var(--text3);margin-bottom:6px">NOW PLAYING</div>
+          <div style="display:flex;align-items:center;gap:10px">
+            <div class="visualizer">
+              <div class="viz-bar"></div><div class="viz-bar"></div>
+              <div class="viz-bar"></div><div class="viz-bar"></div>
+              <div class="viz-bar"></div>
+            </div>
+            <span id="nowPlayingName" style="font-size:13px;font-weight:500"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Journal Panel -->
+    <div class="panel-content" id="panel-journal">
+      <div class="widget">
+        <div class="widget-title"><span>📝</span> Daily Journal</div>
+        <textarea class="journal-area" id="journalText" placeholder="Write your thoughts here... How was your day? What are you grateful for?"
+          oninput="analyzeSentiment(this.value)"></textarea>
+        <div class="sentiment-display" id="sentimentDisplay">
+          <span class="sentiment-emoji">💭</span>
+          <span id="sentimentText">Start writing to see sentiment analysis...</span>
+        </div>
+        <button class="modal-btn" style="font-size:13px;padding:10px;margin-top:12px" onclick="saveJournal()">Save Entry 💾</button>
+      </div>
+
+      <div class="widget" id="journalEntries">
+        <div class="widget-title"><span>📚</span> Past Entries</div>
+        <div id="entriesList" style="display:flex;flex-direction:column;gap:8px">
+          <div style="font-size:12px;color:var(--text3);text-align:center;padding:10px">No entries yet. Start journaling!</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+</div>
+
+<!-- CRISIS MODAL -->
+<div class="modal-overlay crisis-modal" id="crisisModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" style="color:var(--rose)">🆘 Crisis Support</div>
+      <button class="modal-close" onclick="closeModal('crisisModal')">✕</button>
+    </div>
+    <div class="crisis-header">
+      <div class="crisis-emoji">💙</div>
+      <div style="font-family:'Syne',sans-serif;font-size:18px;font-weight:700;margin-bottom:8px">You are not alone</div>
+      <div class="crisis-msg">If you're in crisis, please reach out immediately. These trained professionals are available 24/7 and genuinely care about your well-being.</div>
+    </div>
+    <div class="hotline-list">
+      <a class="hotline-card" href="tel:988">
+        <div class="hotline-icon" style="background:rgba(244,63,94,0.1)">🇺🇸</div>
+        <div class="hotline-info">
+          <h4>Suicide & Crisis Lifeline</h4>
+          <p>24/7 · Free · Confidential</p>
+        </div>
+        <div class="hotline-number">988</div>
+      </a>
+      <a class="hotline-card" href="sms:741741?&body=HOME">
+        <div class="hotline-icon" style="background:rgba(59,130,246,0.1)">💬</div>
+        <div class="hotline-info">
+          <h4>Crisis Text Line</h4>
+          <p>Text HOME to 741741</p>
+        </div>
+        <div class="hotline-number">TEXT</div>
+      </a>
+      <a class="hotline-card" href="tel:+18002738255">
+        <div class="hotline-icon" style="background:rgba(124,58,237,0.1)">🏳️‍🌈</div>
+        <div class="hotline-info">
+          <h4>Trevor Project (LGBTQ+)</h4>
+          <p>24/7 · 1-800-273-8255</p>
+        </div>
+        <div class="hotline-number">CALL</div>
+      </a>
+      <a class="hotline-card" href="tel:+18007994889">
+        <div class="hotline-icon" style="background:rgba(245,158,11,0.1)">🧠</div>
+        <div class="hotline-info">
+          <h4>NAMI Helpline</h4>
+          <p>Mon-Fri 10AM-10PM ET</p>
+        </div>
+        <div class="hotline-number">CALL</div>
+      </a>
+    </div>
+    <button class="modal-btn" onclick="closeModal('crisisModal')">I'm Feeling Safer Now 💚</button>
+  </div>
+</div>
+
+<!-- ASSESSMENT MODAL -->
+<div class="modal-overlay" id="assessModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">📊 Mental Health Assessment</div>
+      <button class="modal-close" onclick="closeModal('assessModal')">✕</button>
+    </div>
+    <div id="assessContent">
+      <div style="font-size:13px;color:var(--text2);margin-bottom:20px;line-height:1.6">
+        This is a brief wellness check. Answer honestly — your responses help personalize your support.
+      </div>
+      <div id="assessQuestions"></div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:16px">
+        <span id="assessProgress" style="font-size:12px;color:var(--text3)">Question 1 of 5</span>
+        <button class="modal-btn" style="width:auto;padding:10px 24px" onclick="nextAssessQuestion()">Next →</button>
+      </div>
+    </div>
+    <div id="assessResult" style="display:none"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ===== AI RESPONSES =====
+const responses = {
+  anxiety: [
+    "I hear you — anxiety can feel overwhelming. 💙 Let's try a quick breathing exercise together. Inhale for 4 counts, hold for 4, exhale for 4. Would you like to try that?",
+    "Anxiety is your mind's way of trying to protect you, but sometimes it works overtime. Let's ground you: can you name 5 things you can see right now? 👀",
+    "You're not alone in this feeling. Research shows that anxiety, while uncomfortable, is temporary. What's the primary source of your anxiety today?"
+  ],
+  sad: [
+    "I'm really sorry you're feeling this way. 💙 Your feelings are completely valid. Would you like to talk about what's been going on, or would a calming exercise help more right now?",
+    "Feeling sad is a natural part of being human. You don't have to put on a brave face here. What happened today that brought these feelings up?",
+    "Sometimes sadness is grief processing itself. I'm here with you. On a scale of 1-10, how heavy does this feel right now?"
+  ],
+  sleep: [
+    "Sleep struggles affect so many people — you're not alone. 🌙 Some things that often help: consistent sleep time, limiting screens 1hr before bed, and a cool dark room. What part of sleep is most difficult for you?",
+    "Let's try a progressive muscle relaxation technique before bed. Start by tensing your toes for 5 seconds, then release. Would you like me to walk you through the full exercise?",
+    "Your sleep quality deeply impacts your mood and cognition. Have you tried our guided meditation tracks? Forest Morning is specifically designed for sleep induction. 🌿"
+  ],
+  lonely: [
+    "Loneliness is one of the hardest feelings to sit with. I want you to know that reaching out here shows real strength. 💙 What does loneliness feel like for you right now — is it a lack of connection, or something deeper?",
+    "You matter, and your presence here matters to me. Loneliness often lies to us about our worth. Can you tell me about one person in your life you feel even a small positive connection with?",
+    "Social connection is a core human need — feeling its absence is painful, not a weakness. Have you considered joining one of our community circles? Sometimes shared experience heals loneliness."
+  ],
+  breathing: [
+    "Wonderful choice! 🌬️ Box breathing is excellent for calming your nervous system. Head over to the 'Tools' tab on the right sidebar — tap the breathing circle to start. Inhale 4, hold 4, exhale 4, hold 4.",
+    "I've cued up a breathing exercise for you! Check the right panel → Tools tab. The box breathing technique activates your parasympathetic system in just 2-3 minutes. Ready?",
+  ],
+  default: [
+    "Thank you for sharing that with me. 🌿 I'm here to listen and support you. Can you tell me more about what you're experiencing?",
+    "I appreciate you opening up. Your mental wellness journey is unique and important. How long have you been feeling this way?",
+    "That takes courage to share. Let's explore this together. What would feel most helpful right now — talking through it, a calming exercise, or some practical tools?",
+    "I'm glad you're here. 💙 Every step you take toward your wellness matters. What's been on your mind lately?",
+    "Your feelings are completely valid. Mental health is just as important as physical health, and you deserve support. Would journaling help you process this?",
+  ]
+};
+
+function getResponse(msg) {
+  const lower = msg.toLowerCase();
+  if (lower.includes('anxi') || lower.includes('panic') || lower.includes('worry') || lower.includes('nervous')) return pick(responses.anxiety);
+  if (lower.includes('sad') || lower.includes('depress') || lower.includes('down') || lower.includes('unhappy') || lower.includes('cry') || lower.includes('hopeless')) return pick(responses.sad);
+  if (lower.includes('sleep') || lower.includes('insomnia') || lower.includes('tired') || lower.includes('rest')) return pick(responses.sleep);
+  if (lower.includes('lone') || lower.includes('alone') || lower.includes('isolat')) return pick(responses.lonely);
+  if (lower.includes('breath') || lower.includes('calm') || lower.includes('relax')) return pick(responses.breathing);
+  return pick(responses.default);
+}
+
+function pick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+
+// ===== CHAT =====
+let messageCount = 0;
+
+function sendMessage() {
+  const input = document.getElementById('chatInput');
+  const text = input.value.trim();
+  if (!text) return;
+  addMessage(text, 'user');
+  input.value = '';
+  input.style.height = '';
+  showTyping();
+  setTimeout(() => { removeTyping(); addMessage(getResponse(text), 'ai'); }, 1200 + Math.random() * 800);
+}
+
+function sendQuick(text) {
+  document.getElementById('chatInput').value = text;
+  sendMessage();
+}
+
+function addMessage(text, who) {
+  const msgs = document.getElementById('messages');
+  const div = document.createElement('div');
+  div.className = `message ${who}`;
+  const time = new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
+  div.innerHTML = `
+    <div class="msg-avatar">${who === 'ai' ? '🤖' : '👤'}</div>
+    <div class="msg-content">
+      <div class="msg-bubble">${text}</div>
+      <div class="msg-time">${time}</div>
+    </div>`;
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+  messageCount++;
+}
+
+let typingEl = null;
+function showTyping() {
+  const msgs = document.getElementById('messages');
+  typingEl = document.createElement('div');
+  typingEl.className = 'message ai typing-indicator';
+  typingEl.innerHTML = `
+    <div class="msg-avatar">🤖</div>
+    <div class="msg-content">
+      <div class="msg-bubble">
+        <div class="typing-dot"></div>
+        <div class="typing-dot"></div>
+        <div class="typing-dot"></div>
+      </div>
+    </div>`;
+  msgs.appendChild(typingEl);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+function removeTyping() {
+  if (typingEl) { typingEl.remove(); typingEl = null; }
+}
+
+function handleKey(e) {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+}
+
+function autoResize(el) {
+  el.style.height = '';
+  el.style.height = Math.min(el.scrollHeight, 120) + 'px';
+}
+
+function clearChat() {
+  if (!confirm('Clear all messages?')) return;
+  document.getElementById('messages').innerHTML = '';
+  messageCount = 0;
+  showToast('💬 Chat cleared');
+  addMessage("Hello again! I'm Aria, your wellness companion. How can I help you today? 🌿", 'ai');
+}
+
+function exportChat() {
+  const msgs = [...document.querySelectorAll('.msg-bubble')];
+  const text = msgs.map((m, i) => (i % 2 === 0 ? 'Aria: ' : 'You: ') + m.innerText).join('\n\n');
+  const blob = new Blob([text], { type: 'text/plain' });
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'mindfulai-chat.txt'; a.click();
+  showToast('📥 Chat exported!');
+}
+
+// ===== MOOD =====
+function trackMood(btn, emoji, val) {
+  document.querySelectorAll('.mood-emoji-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  const msgs = ['Sending love your way 💙', 'It\'s okay to feel down. You\'re not alone 🌿', 'Hang in there, better days ahead ☀️', 'Great to hear! Keep it up 😊', 'Wonderful! You\'re shining today 🌟'];
+  showToast(`Mood tracked: ${emoji} — ${msgs[val-1]}`);
+  // Update chart bar for today
+  const bars = document.querySelectorAll('.mood-bar');
+  if (bars.length) { bars[6].style.height = (val * 20) + '%'; }
+}
+
+// ===== NAV =====
+function setNav(el, section) {
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  el.classList.add('active');
+  if (section === 'journal') switchPanel('journal');
+  else if (section === 'music' || section === 'meditation') switchPanel('tools');
+  else switchPanel('mood');
+}
+
+// ===== PANEL =====
+function switchPanel(id) {
+  document.querySelectorAll('.panel-content').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.panel-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('panel-' + id).classList.add('active');
+  const tabs = document.querySelectorAll('.panel-tab');
+  const map = { mood: 0, tools: 1, journal: 2 };
+  if (tabs[map[id]]) tabs[map[id]].classList.add('active');
+}
+
+// ===== MODALS =====
+function openModal(id) { document.getElementById(id).classList.add('active'); }
+function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+
+// Close on backdrop click
+document.querySelectorAll('.modal-overlay').forEach(el => {
+  el.addEventListener('click', function(e) {
+    if (e.target === this) this.classList.remove('active');
+  });
+});
+
+// ===== ASSESSMENT =====
+const assessQuestions = [
+  { q: "Over the past 2 weeks, how often have you had little interest or pleasure in doing things?", opts: ["Not at all", "Several days", "More than half", "Nearly every day"] },
+  { q: "How often have you felt nervous, anxious, or on edge?", opts: ["Not at all", "Several days", "More than half", "Nearly every day"] },
+  { q: "How would you rate your sleep quality lately?", opts: ["Very good", "Fairly good", "Fairly bad", "Very bad"] },
+  { q: "How connected do you feel to people in your life?", opts: ["Very connected", "Somewhat connected", "Somewhat isolated", "Very isolated"] },
+  { q: "How capable do you feel of handling daily challenges?", opts: ["Very capable", "Somewhat capable", "Struggling a bit", "Very overwhelmed"] }
+];
+
+let currentQ = 0;
+let answers = [];
+
+function renderAssessQuestion() {
+  const q = assessQuestions[currentQ];
+  document.getElementById('assessQuestions').innerHTML = `
+    <div class="assessment-question">
+      <div class="assess-q-text">${currentQ + 1}. ${q.q}</div>
+      <div class="assess-scale">
+        ${q.opts.map((o, i) => `<button class="scale-btn" onclick="selectAnswer(this, ${i})">${i + 1}<br><span style="font-weight:400;font-size:10px">${o}</span></button>`).join('')}
+      </div>
+    </div>`;
+  document.getElementById('assessProgress').textContent = `Question ${currentQ + 1} of ${assessQuestions.length}`;
+}
+
+function selectAnswer(btn, val) {
+  document.querySelectorAll('.scale-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  answers[currentQ] = val;
+}
+
+function nextAssessQuestion() {
+  if (answers[currentQ] === undefined) { showToast('Please select an answer!'); return; }
+  currentQ++;
+  if (currentQ < assessQuestions.length) {
+    renderAssessQuestion();
+  } else {
+    showAssessResult();
+  }
+}
+
+function showAssessResult() {
+  const total = answers.reduce((a,b) => a+b, 0);
+  const max = assessQuestions.length * 3;
+  const score = Math.round((1 - total/max) * 100);
+  const level = score >= 70 ? ['🌟 Thriving', '#22c55e'] : score >= 40 ? ['🌤 Doing OK', '#f59e0b'] : ['💙 Needs Support', '#3b82f6'];
+  document.getElementById('assessContent').style.display = 'none';
+  document.getElementById('assessResult').style.display = 'block';
+  document.getElementById('assessResult').innerHTML = `
+    <div style="text-align:center;padding:20px 0">
+      <div style="font-size:48px;margin-bottom:16px">📊</div>
+      <div style="font-family:'Syne',sans-serif;font-size:24px;font-weight:800;color:${level[1]}">${level[0]}</div>
+      <div style="font-size:48px;font-weight:800;font-family:'Syne',sans-serif;margin:12px 0;background:linear-gradient(135deg,var(--teal),var(--violet2));-webkit-background-clip:text;-webkit-text-fill-color:transparent">${score}</div>
+      <div style="font-size:14px;color:var(--text2);margin-bottom:24px;line-height:1.6">
+        ${score >= 70 ? "You're showing great resilience. Keep up your wellness practices!" : score >= 40 ? "You're managing, but could benefit from more self-care. Small steps matter." : "It looks like you could use some extra support right now. You're brave for checking in."}
+      </div>
+      <button class="modal-btn" onclick="resetAssess()">Take Again</button>
+      <button class="modal-btn" style="background:none;border:1px solid var(--border);margin-top:10px" onclick="closeModal('assessModal')">Close</button>
+    </div>`;
+}
+
+function resetAssess() {
+  currentQ = 0; answers = [];
+  document.getElementById('assessContent').style.display = 'block';
+  document.getElementById('assessResult').style.display = 'none';
+  renderAssessQuestion();
+}
+
+document.getElementById('assessModal').addEventListener('click', function(e) {
+  if (e.target === this) { closeModal('assessModal'); resetAssess(); }
+});
+
+// ===== BREATHING =====
+let breathing = false, breathPhase = 0, breathTimer = null;
+const phases = [{t:'Inhale',s:4},{t:'Hold',s:4},{t:'Exhale',s:4},{t:'Hold',s:4}];
+let breathCount = 0, breathCycle = 0;
+
+function startBreathing() {
+  if (breathTimer) return;
+  breathing = true;
+  document.getElementById('breathText').textContent = '...';
+  runBreathPhase();
+}
+
+function runBreathPhase() {
+  const phase = phases[breathPhase % 4];
+  const circle = document.getElementById('breathCircle');
+  const phaseEl = document.getElementById('breathPhase');
+  const instrEl = document.getElementById('breathInstruction');
+  phaseEl.textContent = phase.t;
+  instrEl.textContent = `${phase.s} seconds...`;
+  circle.className = 'breath-circle ' + (phase.t === 'Inhale' ? 'inhale' : phase.t === 'Exhale' ? 'exhale' : '');
+  document.getElementById('breathText').textContent = phase.t === 'Hold' ? '🤍' : phase.t === 'Inhale' ? '👃' : '💨';
+  breathTimer = setTimeout(() => {
+    breathPhase++;
+    if (breathPhase % 4 === 0) {
+      breathCycle++;
+      if (breathCycle >= 4) { resetBreathing(); showToast('✅ Breathing exercise complete! You did great.'); return; }
+    }
+    runBreathPhase();
+  }, phase.s * 1000);
+}
+
+function resetBreathing() {
+  clearTimeout(breathTimer); breathTimer = null; breathPhase = 0; breathCycle = 0;
+  const c = document.getElementById('breathCircle');
+  c.className = 'breath-circle';
+  document.getElementById('breathText').textContent = 'Tap';
+  document.getElementById('breathPhase').textContent = 'Box Breathing';
+  document.getElementById('breathInstruction').textContent = 'Tap the circle to begin';
+}
+
+// ===== MEDITATION =====
+let medDuration = 300, medRemaining = 300, medInterval = null, medRunning = false;
+
+function setMedTime(mins) {
+  medDuration = mins * 60; medRemaining = medDuration;
+  updateMedDisplay(); resetMeditation();
+}
+
+function updateMedDisplay() {
+  const m = String(Math.floor(medRemaining / 60)).padStart(2, '0');
+  const s = String(medRemaining % 60).padStart(2, '0');
+  document.getElementById('medTime').textContent = `${m}:${s}`;
+}
+
+function toggleMeditation() {
+  if (medRunning) {
+    clearInterval(medInterval); medRunning = false;
+    document.getElementById('medStartBtn').textContent = '▶ Resume';
+  } else {
+    medRunning = true;
+    document.getElementById('medStartBtn').textContent = '⏸ Pause';
+    medInterval = setInterval(() => {
+      medRemaining--;
+      updateMedDisplay();
+      if (medRemaining <= 0) {
+        clearInterval(medInterval); medRunning = false;
+        document.getElementById('medStartBtn').textContent = '▶ Start';
+        showToast('🧘 Meditation complete! Namaste 🙏');
+      }
+    }, 1000);
+  }
+}
+
+function resetMeditation() {
+  clearInterval(medInterval); medRunning = false; medRemaining = medDuration;
+  updateMedDisplay();
+  document.getElementById('medStartBtn').textContent = '▶ Start';
+}
+
+// ===== MUSIC =====
+let currentTrack = null;
+
+function playTrack(el, name) {
+  document.querySelectorAll('.track').forEach(t => { t.classList.remove('playing'); t.querySelector('.track-play').textContent = '▶'; });
+  if (currentTrack === name) {
+    currentTrack = null;
+    document.getElementById('nowPlaying').style.display = 'none';
+    return;
+  }
+  el.classList.add('playing');
+  el.querySelector('.track-play').innerHTML = '<span style="color:var(--rose)">⏸</span>';
+  currentTrack = name;
+  document.getElementById('nowPlayingName').textContent = name;
+  document.getElementById('nowPlaying').style.display = 'block';
+  showToast(`🎵 Now playing: ${name}`);
+}
+
+// ===== JOURNAL =====
+const posWords = ['happy','good','great','wonderful','grateful','love','joy','peace','calm','better','hope','thankful','smile','positive','amazing'];
+const negWords = ['sad','angry','anxious','stress','fear','worry','hate','terrible','awful','hopeless','pain','hurt','alone','tired','overwhelmed'];
+
+function analyzeSentiment(text) {
+  const words = text.toLowerCase().split(/\s+/);
+  let pos = words.filter(w => posWords.some(p => w.includes(p))).length;
+  let neg = words.filter(w => negWords.some(p => w.includes(p))).length;
+  const el = document.getElementById('sentimentText');
+  const emoji = document.querySelector('.sentiment-emoji');
+  if (text.length < 10) { el.textContent = 'Start writing to see sentiment analysis...'; emoji.textContent = '💭'; return; }
+  if (pos > neg * 1.5) { emoji.textContent = '😊'; el.textContent = `Positive sentiment detected! Your writing reflects good energy. Keep it up!`; }
+  else if (neg > pos * 1.5) { emoji.textContent = '💙'; el.textContent = `I notice some difficult feelings in your words. Would you like to talk about it?`; }
+  else { emoji.textContent = '😐'; el.textContent = `Neutral/mixed sentiment. You seem to be processing. That's healthy!`; }
+}
+
+let journalEntries = [];
+
+function saveJournal() {
+  const text = document.getElementById('journalText').value.trim();
+  if (!text) { showToast('Please write something first!'); return; }
+  const entry = { text, date: new Date().toLocaleDateString(), time: new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}) };
+  journalEntries.unshift(entry);
+  renderEntries();
+  document.getElementById('journalText').value = '';
+  document.getElementById('sentimentText').textContent = 'Start writing to see sentiment analysis...';
+  document.querySelector('.sentiment-emoji').textContent = '💭';
+  showToast('📝 Journal entry saved!');
+}
+
+function renderEntries() {
+  const list = document.getElementById('entriesList');
+  if (!journalEntries.length) { list.innerHTML = '<div style="font-size:12px;color:var(--text3);text-align:center;padding:10px">No entries yet.</div>'; return; }
+  list.innerHTML = journalEntries.map((e, i) => `
+    <div style="padding:10px;background:var(--bg3);border-radius:8px;cursor:pointer;transition:all 0.2s" 
+         onmouseover="this.style.background='rgba(0,212,170,0.05)'" 
+         onmouseout="this.style.background='var(--bg3)'">
+      <div style="display:flex;justify-content:space-between;margin-bottom:4px">
+        <span style="font-size:11px;font-weight:600;color:var(--teal)">${e.date}</span>
+        <span style="font-size:10px;color:var(--text3)">${e.time}</span>
+      </div>
+      <div style="font-size:12px;color:var(--text2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${e.text}</div>
+    </div>`).join('');
+}
+
+// ===== TOAST =====
+let toastTimeout;
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  clearTimeout(toastTimeout);
+  t.innerHTML = msg;
+  t.classList.add('show');
+  toastTimeout = setTimeout(() => t.classList.remove('show'), 3500);
+}
+
+// ===== PARTICLES =====
+function createParticles() {
+  const container = document.getElementById('particles');
+  for (let i = 0; i < 20; i++) {
+    const p = document.createElement('div');
+    p.className = 'particle';
+    const size = Math.random() * 3 + 1;
+    const colors = ['var(--teal)', 'var(--violet2)', 'rgba(255,255,255,0.3)'];
+    p.style.cssText = `
+      width:${size}px;height:${size}px;
+      left:${Math.random()*100}vw;
+      background:${colors[Math.floor(Math.random()*3)]};
+      animation-duration:${10+Math.random()*20}s;
+      animation-delay:${Math.random()*15}s;
+      z-index:0;
+    `;
+    container.appendChild(p);
+  }
+}
+
+// ===== INIT =====
+renderAssessQuestion();
+createParticles();
+
+// Initial greeting based on time
+const hour = new Date().getHours();
+let greeting = hour < 12 ? 'Good morning! ☀️' : hour < 17 ? 'Good afternoon! 🌤' : 'Good evening! 🌙';
+setTimeout(() => addMessage(`${greeting} I hope you're taking care of yourself today. Remember, even reaching out is an act of self-care. What's on your mind? 💙`, 'ai'), 2000);
+</script>
+</body>
+</html>

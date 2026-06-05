@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="en">
+<head <!-- Favicon -->
+<link rel="icon" type="image/png" href="https://cdn-icons-png.flaticon.com/512/906/906334.png">>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TaskFlow — Task Portal</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0a0c10;
+      --surface: #111318;
+      --surface2: #181b22;
+      --border: rgba(255,255,255,0.07);
+      --border2: rgba(255,255,255,0.13);
+      --accent: #6c63ff;
+      --accent2: #a78bfa;
+      --green: #22d3a0;
+      --amber: #f59e0b;
+      --red: #ef4444;
+      --text: #f0f0f5;
+      --muted: #8b8fa8;
+      --font-head: 'Syne', sans-serif;
+      --font-body: 'DM Sans', sans-serif;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-body);
+      min-height: 100vh;
+    }
+
+    .portal {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 2rem 1.5rem;
+    }
+
+    .top-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 2rem;
+      padding-bottom: 1.25rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .logo {
+      font-family: var(--font-head);
+      font-size: 1.4rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+    .logo span { color: var(--accent2); }
+
+    .role-toggle {
+      display: flex;
+      background: var(--surface);
+      border: 1px solid var(--border2);
+      border-radius: 999px;
+      padding: 3px;
+      gap: 2px;
+    }
+
+    .role-btn {
+      font-family: var(--font-body);
+      font-size: 0.82rem;
+      font-weight: 500;
+      padding: 7px 20px;
+      border: none;
+      border-radius: 999px;
+      cursor: pointer;
+      transition: all 0.2s;
+      background: transparent;
+      color: var(--muted);
+    }
+    .role-btn.active { background: var(--accent); color: #fff; }
+
+    .view { display: none; }
+    .view.active { display: block; }
+
+    .section-head {
+      font-family: var(--font-head);
+      font-size: 1.05rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--accent2);
+      flex-shrink: 0;
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 1.5rem;
+      margin-bottom: 1rem;
+    }
+
+    label {
+      display: block;
+      font-size: 0.75rem;
+      color: var(--muted);
+      margin-bottom: 6px;
+      font-weight: 500;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    input, textarea, select {
+      width: 100%;
+      background: var(--surface2);
+      border: 1px solid var(--border2);
+      border-radius: 8px;
+      padding: 10px 14px;
+      color: var(--text);
+      font-family: var(--font-body);
+      font-size: 0.9rem;
+      margin-bottom: 1rem;
+      outline: none;
+      transition: border-color 0.2s;
+      resize: vertical;
+    }
+    input:focus, textarea:focus, select:focus { border-color: var(--accent2); }
+    select option { background: #1a1d27; }
+
+    .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+
+    .btn {
+      font-family: var(--font-head);
+      font-size: 0.88rem;
+      font-weight: 600;
+      padding: 10px 22px;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      transition: all 0.18s;
+      letter-spacing: 0.01em;
+    }
+    .btn-primary { background: var(--accent); color: #fff; }
+    .btn-primary:hover { background: #7c75ff; transform: translateY(-1px); }
+    .btn-outline {
+      background: transparent;
+      color: var(--text);
+      border: 1px solid var(--border2);
+    }
+    .btn-outline:hover { border-color: var(--accent2); color: var(--accent2); }
+    .btn-green { background: var(--green); color: #041a12; }
+    .btn-green:hover { opacity: 0.88; }
+    .btn-danger {
+      background: rgba(239,68,68,0.1);
+      color: var(--red);
+      border: 1px solid rgba(239,68,68,0.2);
+    }
+    .btn-sm { padding: 6px 14px; font-size: 0.78rem; }
+
+    .tag {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 999px;
+      font-size: 0.72rem;
+      font-weight: 500;
+    }
+    .tag-open { background: rgba(34,211,160,0.12); color: var(--green); border: 1px solid rgba(34,211,160,0.25); }
+    .tag-closed { background: rgba(239,68,68,0.1); color: var(--red); border: 1px solid rgba(239,68,68,0.2); }
+    .tag-pending { background: rgba(245,158,11,0.1); color: var(--amber); border: 1px solid rgba(245,158,11,0.2); }
+    .tag-subject { background: rgba(108,99,255,0.12); color: var(--accent2); border: 1px solid rgba(108,99,255,0.2); }
+
+    .task-item {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.25rem 1.5rem;
+      margin-bottom: 0.85rem;
+      transition: border-color 0.2s;
+      animation: fadeIn 0.25s ease both;
+    }
+    .task-item:hover { border-color: var(--border2); }
+    .task-item.selected { border-color: var(--accent); }
+
+    .task-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 1rem;
+      margin-bottom: 0.6rem;
+    }
+    .task-title { font-family: var(--font-head); font-size: 0.95rem; font-weight: 600; }
+    .task-meta { font-size: 0.78rem; color: var(--muted); margin-top: 0.3rem; }
+    .task-desc { font-size: 0.85rem; color: var(--muted); line-height: 1.6; margin-top: 0.5rem; margin-bottom: 0.8rem; }
+    .task-footer { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+
+    .submission-form {
+      margin-top: 1.25rem;
+      padding-top: 1.25rem;
+      border-top: 1px solid var(--border);
+      display: none;
+    }
+    .submission-form.open { display: block; }
+
+    .sub-item {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1rem 1.25rem;
+      margin-bottom: 0.7rem;
+      display: flex;
+      align-items: flex-start;
+      gap: 1rem;
+    }
+    .sub-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: var(--accent);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 0.75rem;
+      flex-shrink: 0;
+      font-family: var(--font-head);
+    }
+    .sub-name { font-size: 0.85rem; font-weight: 500; }
+    .sub-time { font-size: 0.72rem; color: var(--muted); }
+    .sub-answer { font-size: 0.82rem; color: var(--muted); margin-top: 0.35rem; line-height: 1.55; }
+
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+      margin-bottom: 1.75rem;
+    }
+    .stat-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.2rem;
+      text-align: center;
+    }
+    .stat-num { font-family: var(--font-head); font-size: 1.8rem; font-weight: 700; color: var(--accent2); }
+    .stat-label { font-size: 0.72rem; color: var(--muted); margin-top: 4px; text-transform: uppercase; letter-spacing: 0.05em; }
+
+    .filter-row { display: flex; gap: 8px; margin-bottom: 1rem; flex-wrap: wrap; }
+    .filter-btn {
+      font-size: 0.75rem;
+      padding: 5px 14px;
+      border-radius: 999px;
+      border: 1px solid var(--border2);
+      background: transparent;
+      color: var(--muted);
+      cursor: pointer;
+      font-family: var(--font-body);
+      transition: all 0.15s;
+    }
+    .filter-btn.active { background: var(--surface2); color: var(--text); border-color: var(--accent2); }
+
+    .no-tasks {
+      color: var(--muted);
+      font-size: 0.85rem;
+      text-align: center;
+      padding: 2.5rem 1rem;
+    }
+
+    .subs-header {
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--muted);
+      margin-bottom: 0.75rem;
+    }
+
+    .subs-section {
+      margin-top: 1rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--border);
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      background: var(--green);
+      color: #041a12;
+      font-family: var(--font-head);
+      font-size: 0.82rem;
+      font-weight: 700;
+      padding: 10px 22px;
+      border-radius: 8px;
+      transform: translateY(80px);
+      opacity: 0;
+      transition: all 0.3s;
+      z-index: 999;
+      pointer-events: none;
+    }
+    .toast.show { transform: translateY(0); opacity: 1; }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 600px) {
+      .row2 { grid-template-columns: 1fr; }
+      .stats-row { grid-template-columns: 1fr; }
+      .top-bar { flex-direction: column; gap: 1rem; align-items: flex-start; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="portal">
+
+  <!-- TOP BAR -->
+  <div class="top-bar">
+    <div class="logo">Task<span>Flow</span></div>
+    <div class="role-toggle">
+      <button class="role-btn active" onclick="switchRole('instructor', this)">&#128203; Instructor</button>
+      <button class="role-btn" onclick="switchRole('student', this)">&#127891; Student</button>
+    </div>
+  </div>
+
+  <!-- ===================== INSTRUCTOR VIEW ===================== -->
+  <div id="view-instructor" class="view active">
+
+    <!-- Stats -->
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-num" id="stat-total">0</div>
+        <div class="stat-label">Tasks Posted</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num" id="stat-subs">0</div>
+        <div class="stat-label">Submissions</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num" id="stat-open">0</div>
+        <div class="stat-label">Open Tasks</div>
+      </div>
+    </div>
+
+    <!-- Post Task Form -->
+    <div class="card">
+      <div class="section-head"><div class="dot"></div>Post New Task</div>
+
+      <label>Task Title</label>
+      <input type="text" id="task-title" placeholder="e.g. Build a simple login form" />
+
+      <label>Description / Instructions</label>
+      <textarea id="task-desc" rows="4" placeholder="Describe the task clearly for your students..."></textarea>
+
+      <div class="row2">
+        <div>
+          <label>Subject / Category</label>
+          <select id="task-subject">
+            <option>Web Development</option>
+            <option>Python</option>
+            <option>Data Science</option>
+            <option>Machine Learning</option>
+            <option>Database (SQL)</option>
+            <option>Java</option>
+            <option>C / C++</option>
+            <option>Other</option>
+          </select>
+        </div>
+        <div>
+          <label>Deadline</label>
+          <input type="datetime-local" id="task-deadline" />
+        </div>
+      </div>
+
+      <button class="btn btn-primary" onclick="postTask()">&#10010; Post Task</button>
+    </div>
+
+    <!-- Task List -->
+    <div class="section-head" style="margin-top:1.75rem"><div class="dot"></div>Posted Tasks</div>
+    <div id="instructor-task-list"></div>
+  </div>
+
+  <!-- ===================== STUDENT VIEW ===================== -->
+  <div id="view-student" class="view">
+
+    <div class="filter-row">
+      <button class="filter-btn active" onclick="filterTasks('all', this)">All Tasks</button>
+      <button class="filter-btn" onclick="filterTasks('open', this)">Open</button>
+      <button class="filter-btn" onclick="filterTasks('closed', this)">Closed</button>
+    </div>
+
+    <div class="section-head"><div class="dot"></div>Available Tasks</div>
+    <div id="student-task-list"></div>
+  </div>
+
+</div>
+
+<!-- Toast Notification -->
+<div class="toast" id="toast"></div>
+
+<script>
+  /* ===========================
+     DATA STORE
+  =========================== */
+  let tasks = [];
+  let currentFilter = 'all';
+
+  /* ===========================
+     ROLE SWITCHING
+  =========================== */
+  function switchRole(role, btn) {
+    document.querySelectorAll('.role-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('view-' + role).classList.add('active');
+    renderAll();
+  }
+
+  /* ===========================
+     POST TASK (Instructor)
+  =========================== */
+  function postTask() {
+    const title    = document.getElementById('task-title').value.trim();
+    const desc     = document.getElementById('task-desc').value.trim();
+    const subject  = document.getElementById('task-subject').value;
+    const deadline = document.getElementById('task-deadline').value;
+
+    if (!title) { showToast('Please enter a task title!', '#ef4444'); return; }
+    if (!desc)  { showToast('Please enter a description!', '#ef4444'); return; }
+
+    tasks.unshift({
+      id: Date.now(),
+      title, desc, subject, deadline,
+      status: 'open',
+      submissions: []
+    });
+
+    document.getElementById('task-title').value    = '';
+    document.getElementById('task-desc').value     = '';
+    document.getElementById('task-deadline').value = '';
+
+    renderAll();
+    showToast('Task posted successfully!');
+  }
+
+  /* ===========================
+     TOGGLE OPEN / CLOSE
+  =========================== */
+  function toggleTask(id) {
+    const t = tasks.find(x => x.id === id);
+    if (t) {
+      t.status = t.status === 'open' ? 'closed' : 'open';
+      renderAll();
+    }
+  }
+
+  /* ===========================
+     DELETE TASK
+  =========================== */
+  function deleteTask(id) {
+    if (!confirm('Delete this task? This cannot be undone.')) return;
+    tasks = tasks.filter(x => x.id !== id);
+    renderAll();
+  }
+
+  /* ===========================
+     SUBMIT TASK (Student)
+  =========================== */
+  function submitTask(id) {
+    const name   = document.getElementById('s-name-' + id).value.trim();
+    const answer = document.getElementById('s-answer-' + id).value.trim();
+
+    if (!name)   { showToast('Please enter your name!', '#ef4444'); return; }
+    if (!answer) { showToast('Please write your answer!', '#ef4444'); return; }
+
+    const t = tasks.find(x => x.id === id);
+    if (t) {
+      t.submissions.push({
+        name,
+        answer,
+        time: new Date().toLocaleString('en-IN', {
+          day: '2-digit', month: 'short', year: 'numeric',
+          hour: '2-digit', minute: '2-digit'
+        })
+      });
+      document.getElementById('s-name-' + id).value   = '';
+      document.getElementById('s-answer-' + id).value = '';
+      closeForm(id);
+      renderAll();
+      showToast('Submitted successfully! Great work.');
+    }
+  }
+
+  /* ===========================
+     TOGGLE SUBMISSION FORM
+  =========================== */
+  function openForm(id) {
+    const f = document.getElementById('form-' + id);
+    if (f) f.classList.toggle('open');
+  }
+
+  function closeForm(id) {
+    const f = document.getElementById('form-' + id);
+    if (f) f.classList.remove('open');
+  }
+
+  /* ===========================
+     FILTER (Student)
+  =========================== */
+  function filterTasks(filter, btn) {
+    currentFilter = filter;
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    renderStudentList();
+  }
+
+  /* ===========================
+     HELPERS
+  =========================== */
+  function initials(name) {
+    return name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
+  }
+
+  function formatDeadline(dl) {
+    if (!dl) return '';
+    const d = new Date(dl);
+    return d.toLocaleDateString('en-IN', {
+      day: 'numeric', month: 'short', year: 'numeric',
+      hour: '2-digit', minute: '2-digit'
+    });
+  }
+
+  function isPastDeadline(dl) {
+    if (!dl) return false;
+    return new Date(dl) < new Date();
+  }
+
+  /* ===========================
+     RENDER — INSTRUCTOR LIST
+  =========================== */
+  function renderInstructorList() {
+    const el = document.getElementById('instructor-task-list');
+    if (!tasks.length) {
+      el.innerHTML = '<div class="no-tasks">No tasks posted yet. Create your first one above.</div>';
+      return;
+    }
+
+    el.innerHTML = tasks.map(t => `
+      <div class="task-item">
+        <div class="task-top">
+          <div>
+            <div class="task-title">${escHtml(t.title)}</div>
+            <div class="task-meta">
+              ${escHtml(t.subject)}
+              ${t.deadline ? ' &nbsp;&middot;&nbsp; Due: <strong>' + formatDeadline(t.deadline) + '</strong>' : ''}
+            </div>
+          </div>
+          <div style="display:flex;gap:8px;align-items:center;flex-shrink:0">
+            <span class="tag ${t.status === 'open' ? 'tag-open' : 'tag-closed'}">${t.status.toUpperCase()}</span>
+          </div>
+        </div>
+
+        <div class="task-desc">${escHtml(t.desc)}</div>
+
+        <div class="task-footer">
+          <span class="tag tag-subject">${escHtml(t.subject)}</span>
+          <span style="font-size:0.78rem;color:var(--muted)">
+            ${t.submissions.length} submission${t.submissions.length !== 1 ? 's' : ''}
+          </span>
+          <button class="btn btn-outline btn-sm" onclick="toggleTask(${t.id})">
+            ${t.status === 'open' ? 'Close Task' : 'Reopen Task'}
+          </button>
+          <button class="btn btn-danger btn-sm" onclick="deleteTask(${t.id})">Delete</button>
+        </div>
+
+        ${t.submissions.length ? `
+          <div class="subs-section">
+            <div class="subs-header">Submissions (${t.submissions.length})</div>
+            ${t.submissions.map(s => `
+              <div class="sub-item">
+                <div class="sub-avatar">${initials(s.name)}</div>
+                <div style="flex:1;min-width:0">
+                  <div class="sub-name">${escHtml(s.name)}</div>
+                  <div class="sub-time">${s.time}</div>
+                  <div class="sub-answer">${escHtml(s.answer)}</div>
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        ` : ''}
+      </div>
+    `).join('');
+  }
+
+  /* ===========================
+     RENDER — STUDENT LIST
+  =========================== */
+  function renderStudentList() {
+    const el = document.getElementById('student-task-list');
+    const filtered = tasks.filter(t =>
+      currentFilter === 'all' ? true : t.status === currentFilter
+    );
+
+    if (!filtered.length) {
+      el.innerHTML = '<div class="no-tasks">No tasks available right now. Check back later.</div>';
+      return;
+    }
+
+    el.innerHTML = filtered.map(t => `
+      <div class="task-item">
+        <div class="task-top">
+          <div>
+            <div class="task-title">${escHtml(t.title)}</div>
+            <div class="task-meta">
+              ${escHtml(t.subject)}
+              ${t.deadline ? ' &nbsp;&middot;&nbsp; Due: <strong>' + formatDeadline(t.deadline) + '</strong>' : ''}
+            </div>
+          </div>
+          <span class="tag ${t.status === 'open' ? 'tag-open' : 'tag-closed'}">${t.status.toUpperCase()}</span>
+        </div>
+
+        <div class="task-desc">${escHtml(t.desc)}</div>
+
+        <div class="task-footer">
+          <span class="tag tag-subject">${escHtml(t.subject)}</span>
+          <span style="font-size:0.78rem;color:var(--muted)">${t.submissions.length} submitted</span>
+          ${t.status === 'open'
+            ? `<button class="btn btn-green btn-sm" onclick="openForm(${t.id})">&#10003; Submit Answer</button>`
+            : `<span style="font-size:0.78rem;color:var(--red)">&#128274; Task closed</span>`
+          }
+        </div>
+
+        ${t.status === 'open' ? `
+          <div class="submission-form" id="form-${t.id}">
+            <label>Your Full Name</label>
+            <input type="text" id="s-name-${t.id}" placeholder="e.g. Ayush Gangwar" />
+            <label>Your Answer / Solution</label>
+            <textarea id="s-answer-${t.id}" rows="5" placeholder="Write your complete answer or solution here..."></textarea>
+            <div style="display:flex;gap:10px;flex-wrap:wrap">
+              <button class="btn btn-green" onclick="submitTask(${t.id})">Submit</button>
+              <button class="btn btn-outline" onclick="closeForm(${t.id})">Cancel</button>
+            </div>
+          </div>
+        ` : ''}
+      </div>
+    `).join('');
+  }
+
+  /* ===========================
+     RENDER — STATS
+  =========================== */
+  function renderStats() {
+    document.getElementById('stat-total').textContent = tasks.length;
+    document.getElementById('stat-subs').textContent  = tasks.reduce((a, t) => a + t.submissions.length, 0);
+    document.getElementById('stat-open').textContent  = tasks.filter(t => t.status === 'open').length;
+  }
+
+  /* ===========================
+     RENDER ALL
+  =========================== */
+  function renderAll() {
+    renderInstructorList();
+    renderStudentList();
+    renderStats();
+  }
+
+  /* ===========================
+     TOAST NOTIFICATION
+  =========================== */
+  function showToast(msg, color) {
+    const t = document.getElementById('toast');
+    t.textContent     = msg;
+    t.style.background = color || 'var(--green)';
+    t.style.color      = color ? '#fff' : '#041a12';
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2800);
+  }
+
+  /* ===========================
+     ESCAPE HTML (security)
+  =========================== */
+  function escHtml(str) {
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+  }
+
+  /* ===========================
+     DEMO TASK (pre-loaded)
+  =========================== */
+  tasks.push({
+    id: 1,
+    title: 'Build a Responsive Login Page',
+    subject: 'Web Development',
+    deadline: '',
+    status: 'open',
+    desc: 'Create a responsive HTML/CSS login form with email and password fields, a submit button, and basic input validation using JavaScript. Make it mobile-friendly.',
+    submissions: [
+      {
+        name: 'Priya Sharma',
+        answer: 'I used Flexbox for centering and added regex validation for the email field. The form is fully responsive using media queries.',
+        time: new Date().toLocaleString('en-IN')
+      }
+    ]
+  });
+
+  renderAll();
+</script>
+
+</body>
+</html>
